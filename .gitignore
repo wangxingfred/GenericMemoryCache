@@ -41,3 +41,22 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio 2015 cache/options directory
+.vs/
+/packages/NUnit.2.6.4/.signature.p7s
+/packages/NUnit.2.6.4/NUnit.2.6.4.nupkg
+/packages/NUnit.2.6.4/lib/nunit.framework.dll
+/packages/NUnit.2.6.4/lib/nunit.framework.xml

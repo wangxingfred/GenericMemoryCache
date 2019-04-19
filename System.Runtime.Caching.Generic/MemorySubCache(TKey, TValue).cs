@@ -21,7 +21,9 @@ namespace System.Runtime.Caching.Generic
 
         protected ICacheEviction<TKey, TValue> State { get; private set; }
 
+#if THREAD_SAFE
         protected readonly object SyncRoot = new object();
+#endif
 
         protected bool IsEvicting;
 
@@ -43,10 +45,14 @@ namespace System.Runtime.Caching.Generic
 
         protected override IDictionary<TKey, TValue> GetSnapshot()
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
+#endif
                 return new Dictionary<TKey, TValue>(State);
+#if THREAD_SAFE
             }
+#endif
         }
 
         protected bool InternalTryGet(TKey key, out TValue value)
@@ -94,40 +100,54 @@ namespace System.Runtime.Caching.Generic
             return State.Evict(EvictionReason.Removal, key);
         }
 
-        #region IManagedCache<TKey, TValue> implementation
+#region IManagedCache<TKey, TValue> implementation
         public override bool Contains(TKey key)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
+#endif
                 return State.ContainsKey(key);
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override bool TryGet(TKey key, out TValue value)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
+#endif
                 return InternalTryGet(key, out value);
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override TValue Get(TKey key)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
+#endif
                 TValue cached;
                 if (!InternalTryGet(key, out cached))
                 {
                     throw new KeyNotFoundException();
                 }
                 return cached;
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override TValue GetOrAdd(TKey key, TValue value)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
+#endif
                 TValue cached;
                 if (!InternalTryGet(key, out cached))
                 {
@@ -135,13 +155,17 @@ namespace System.Runtime.Caching.Generic
                     return value;
                 }
                 return cached;
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override TValue GetOrAdd<TContext>(TKey key, Func<TContext, TValue> updater, TContext context)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
+#endif
                 TValue cached;
                 if (!InternalTryGet(key, out cached))
                 {
@@ -149,31 +173,45 @@ namespace System.Runtime.Caching.Generic
                     InternalSet(key, cached, false);
                 }
                 return cached;
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override bool Add(TKey key, TValue value)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
-                return InternalSet(key, value, false);
+#endif
+            return InternalSet(key, value, false);
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override void Put(TKey key, TValue value)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
-                InternalSet(key, value, true);
+#endif
+            InternalSet(key, value, true);
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override bool Remove(TKey key)
         {
+#if THREAD_SAFE
             lock (SyncRoot)
             {
-                return InternalRemove(key);
+#endif
+            return InternalRemove(key);
+#if THREAD_SAFE
             }
+#endif
         }
 
         public override int Capacity
@@ -188,12 +226,16 @@ namespace System.Runtime.Caching.Generic
         {
             get
             {
+#if THREAD_SAFE
                 lock (SyncRoot)
                 {
-                    return State != null ? State.Count : 0;
+#endif
+                return State != null ? State.Count : 0;
+#if THREAD_SAFE
                 }
+#endif
             }
         }
-        #endregion
+#endregion
     }
 }
